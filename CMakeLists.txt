@@ -1,1 +1,3 @@
-https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html
+cmake_minimum_required(VERSION 3.10)
+project(RayMarching)
+add_executable(RayMarching raymarching.cxx)
