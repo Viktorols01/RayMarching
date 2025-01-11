@@ -2,9 +2,9 @@
 #include <string>
 
 #include <windows.h>
-#include <SDL2/SDL.h>
+#include "SDL.h"
 
-int main() {
+int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow(
@@ -30,4 +30,6 @@ int main() {
     std::string name;
     std::cin >> name;
     std::cout << name << std::endl;
+
+    return 0;
 }
