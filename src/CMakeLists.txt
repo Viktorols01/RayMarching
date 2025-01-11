@@ -7,6 +7,7 @@ include_directories(RayMarching ${SDL2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/../incl
 
 add_executable(RayMarching 
     main/raymarching.cxx
+    main/renderspace.cxx
     classes/Sphere.cxx
     )
 

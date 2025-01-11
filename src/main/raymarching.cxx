@@ -3,24 +3,31 @@
 
 #include <windows.h>
 #include "SDL.h"
-
-#include "Sphere.h"
+#include "renderspace.cxx"
 
 int main(int argc, char* argv[]) {
+    int W = 640;
+    int H = 480;
+
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow(
         "SDL2Test",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        640,
-        480,
+        W,
+        H,
         0
     );
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+    
+    // Fill background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
+    
+    renderspace(renderer, W, H);
+    
     SDL_RenderPresent(renderer);
 
     SDL_Delay(3000);
@@ -28,14 +35,5 @@ int main(int argc, char* argv[]) {
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    Sphere* sphere = new Sphere(1, 0, 0, 1);
-
-    double dist = sphere->getMinimumDistance(0, 0, 0);
-
-    std::cout << "Hej värld!" << dist << std::endl;
-    std::string name;
-    std::cin >> name;
-    std::cout << name << std::endl;
-
     return 0;
-}
+};
