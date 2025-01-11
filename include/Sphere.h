@@ -1,9 +1,7 @@
-#include "Shape.h"
-
 #ifndef SPHERE_H
 #define SPHERE_H
 
-class Sphere : public Shape {
+class Sphere {
     private:
     double x;
     double y;

@@ -6,7 +6,6 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/SDL2/include",
                 "${workspaceFolder}/src/classes",
-                "${workspaceFolder}/include/classes",
                 "${workspaceFolder}/include"
             ],
             "defines": [
