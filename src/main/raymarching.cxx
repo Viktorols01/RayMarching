@@ -7,6 +7,7 @@
 #include <float.h>
 
 #include "SDL.h"
+#include "Shape.h"
 #include "Sphere.h"
 
 struct RayMarchInfo
@@ -44,7 +45,7 @@ RayMarchInfo calculateDistance(double startX, double startY, double startZ, doub
     double dy = sin(phi) * sin(theta);
     double dz = cos(phi);
 
-    std::vector<Sphere *> shapes = {new Sphere(10, 0, 0, 3), new Sphere(20, 10, 0, 3)};
+    std::vector<Shape *> shapes = {new Sphere(10, 0, 0, 3), new Sphere(20, 10, 0, 3)};
 
     double minDistance = DBL_MAX;
     double maxDistance = DBL_MIN;
@@ -60,7 +61,7 @@ RayMarchInfo calculateDistance(double startX, double startY, double startZ, doub
 
         minDistance = DBL_MAX;
         maxDistance = DBL_MIN;
-        for (Sphere *shape : shapes)
+        for (Shape *shape : shapes)
         {
             double distance = shape->getMinimumDistance(x, y, z);
             if (distance < minDistance)
@@ -157,6 +158,10 @@ void handleInput(std::map<int, bool> keyboard, Position &pos, double &phi, doubl
     if (keyboard[SDL_KeyCode::SDLK_SPACE])
     {
         pos.z = pos.z + 1;
+    }
+    if (keyboard[SDL_KeyCode::SDLK_LSHIFT])
+    {
+        pos.z = pos.z - 1;
     }
     if (keyboard[SDL_KeyCode::SDLK_DOWN])
     {

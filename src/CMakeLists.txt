@@ -8,6 +8,7 @@ include_directories(RayMarching ${SDL2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/../incl
 add_executable(RayMarching 
     main/raymarching.cxx
     classes/Sphere.cxx
+    classes/Cube.cxx
     )
 
 target_link_libraries(RayMarching ${SDL2_LIBRARIES})
