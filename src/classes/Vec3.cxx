@@ -9,6 +9,10 @@ double Vec3::getLength()
     return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
+Vec3 Vec3::absolute() {
+    return Vec3(fabs(this->x), fabs(this->y), fabs(this->z));
+}
+
 Vec3 Vec3::getUnitVector(double phi, double theta)
 {
     double x = sin(phi) * cos(theta);

@@ -9,6 +9,7 @@ class Vec3 {
 
     Vec3::Vec3(double x, double y, double z);
     double Vec3::getLength();
+    Vec3 Vec3::absolute();
     static Vec3 Vec3::getUnitVector(double phi, double theta);
 
     Vec3 Vec3::operator+(Vec3 const& v);
