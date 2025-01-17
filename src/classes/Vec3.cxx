@@ -1,4 +1,5 @@
 #include <math.h>
+#include <cmath>
 
 #include "Vec3.h"
 
@@ -39,6 +40,11 @@ Vec3 Vec3::operator*(double d)
 Vec3 Vec3::operator/(double d)
 {
     return Vec3(this->x / d, this->y / d, this->z / d);
+}
+
+Vec3 Vec3::operator%(double d)
+{
+    return Vec3(std::fmod(this->x, d), std::fmod(this->y, d), std::fmod(this->z, d));
 }
 
 double Vec3::operator*(Vec3 const& v) {

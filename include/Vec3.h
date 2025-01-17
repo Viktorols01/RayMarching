@@ -16,6 +16,7 @@ class Vec3 {
     Vec3 Vec3::operator-(Vec3 const& v);
     Vec3 Vec3::operator*(double d);
     Vec3 Vec3::operator/(double d);
+    Vec3 Vec3::operator%(double d);
 
     double Vec3::operator*(Vec3 const& v);
 };

@@ -32,12 +32,12 @@ double d(Vec3 v1, Vec3 v2)
 };
 
 RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
-{   
+{
     Vec3 x = startx;
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
-    std::vector<Shape*> shapes = {
-        //&Sphere(Vec3(10, 0, 0), 3), 
+    std::vector<Shape *> shapes = {
+        //&Sphere(Vec3(10, 0, 0), 3),
         &Sphere(Vec3(20, 10, 0), 3),
         &Cube(Vec3(20, -10, 0), 3)};
 
@@ -45,7 +45,7 @@ RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
     double maxDistance = DBL_MIN;
     double prevMinDistance = DBL_MAX;
     double prevMaxDistance = DBL_MIN;
-    Shape* minShape = nullptr; 
+    Shape *minShape = nullptr;
 
     int iter = 0;
     double tol = 0.01;
@@ -58,7 +58,7 @@ RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
         minDistance = DBL_MAX;
         maxDistance = DBL_MIN;
 
-        for (Shape* shape : shapes)
+        for (Shape *shape : shapes)
         {
             double distance = shape->getMinimumDistance(x);
             if (distance < minDistance)
@@ -87,7 +87,7 @@ RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
 
     double endDistance = d(x, startx);
 
-    double dot = minShape->getNormal(x)*(startx - x)/(startx - x).getLength();
+    double dot = minShape->getNormal(x) * (startx - x) / (startx - x).getLength();
 
     return {endDistance, iter, dot};
 };
@@ -100,9 +100,9 @@ RGB getColor(RayMarchInfo info)
         return {0, 0, 0};
     }
     else
-    {   
+    {
         double f = info.dot;
-        return {(int) (55 + 200*f), (int) (55 + 200*f), (int) (55 + 200*f)};
+        return {(int)(255 * f), (int)(255 * f), (int)(255 * f)};
     }
 };
 
@@ -120,14 +120,15 @@ Uint32 toInt(RGB color)
     return (color.r << 24) + (color.b << 16) + (color.b << 8);
 }
 
-void setRenderedPixels(Uint32* pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
+void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
 {
     for (int i = 0; i < W; i++)
     {
         for (int j = 0; j < H; j++)
         {
-            double phi = startPhi - M_PI / 3 + 2 * M_PI / 3 * j / H;
-            double theta = startTheta - M_PI / 3 + 2 * M_PI / 3 * i / W;
+            double range = M_PI / 2;
+            double phi = startPhi - range / 2 + range * j / H;
+            double theta = startTheta - range / 2 + range * i / W;
 
             RayMarchInfo info = calculateDistance(startPosition, phi, theta);
             RGB color = getColor(info);
@@ -141,19 +142,19 @@ void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &t
 
     if (keyboard[SDL_KeyCode::SDLK_w])
     {
-        pos = pos + Vec3::getUnitVector(M_PI/2, theta);
+        pos = pos + Vec3::getUnitVector(M_PI / 2, theta);
     }
     if (keyboard[SDL_KeyCode::SDLK_s])
     {
-        pos = pos + Vec3::getUnitVector(M_PI/2, theta + M_PI);
+        pos = pos + Vec3::getUnitVector(M_PI / 2, theta + M_PI);
     }
     if (keyboard[SDL_KeyCode::SDLK_a])
     {
-        pos = pos + Vec3::getUnitVector(M_PI/2, theta - M_PI/2);
+        pos = pos + Vec3::getUnitVector(M_PI / 2, theta - M_PI / 2);
     }
     if (keyboard[SDL_KeyCode::SDLK_d])
     {
-        pos = pos + Vec3::getUnitVector(M_PI/2, theta + M_PI/2);
+        pos = pos + Vec3::getUnitVector(M_PI / 2, theta + M_PI / 2);
     }
     if (keyboard[SDL_KeyCode::SDLK_SPACE])
     {
@@ -183,8 +184,8 @@ void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &t
 
 int main(int argc, char *argv[])
 {
-    int W = 300;
-    int H = 300;
+    int W = 200;
+    int H = 200;
 
     Vec3 pos = Vec3(0, 0, 0);
     double phi = M_PI / 2;
@@ -206,10 +207,10 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        void* pixels = new Uint32[W*H];
+        void *pixels = new Uint32[W * H];
         int pitch;
         SDL_LockTexture(texture, NULL, &pixels, &pitch);
-        setRenderedPixels((Uint32*) pixels, W, H, pos, phi, theta);
+        setRenderedPixels((Uint32 *)pixels, W, H, pos, phi, theta);
         SDL_UnlockTexture(texture);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);

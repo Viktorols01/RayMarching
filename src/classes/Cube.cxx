@@ -1,8 +1,8 @@
 #include <math.h>
+#include <utility>
 
 #include "Shape.h"
 #include "Cube.h"
-#include <utility>
 
 Cube::Cube(Vec3 v, double r) : v(v), r(r) {};
 
