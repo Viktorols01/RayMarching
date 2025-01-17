@@ -2,10 +2,16 @@
 
 #include "Shape.h"
 #include "Cube.h"
+#include <utility>
 
-Sphere::Sphere(double x, double y, double z, double r) : x(x), y(y), z(z), r(r) {};
+Cube::Cube(Vec3 v, double r) : v(v), r(r) {};
 
-double Sphere::getMinimumDistance(double x, double y, double z)
-{
-    return sqrt((x - this->x)*(x - this->x) + (y - this->y)*(y - this->y) + (z - this->z)*(z - this->z)) - this->r;
+double Cube::getMinimumDistance(Vec3 v)
+{   
+    
+    return 0;
+}
+
+Vec3 Cube::getNormal(Vec3 v) {
+    return v - this->v;
 }

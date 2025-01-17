@@ -1,17 +1,17 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "Vec3.h"
 #include "Shape.h"
 
 class Sphere : public Shape {
     private:
-    double x;
-    double y;
-    double z;
+    Vec3 v;
     double r;
     public:
-    Sphere::Sphere(double x, double y, double z, double r);
-    double getMinimumDistance(double x, double y, double z);
+    Sphere::Sphere(Vec3 v, double r);
+    double getMinimumDistance(Vec3 v);
+    Vec3 getNormal(Vec3 v);
 };
 
 #endif

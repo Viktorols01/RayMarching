@@ -9,11 +9,13 @@
 #include "SDL.h"
 #include "Shape.h"
 #include "Sphere.h"
+#include "Vec3.h"
 
 struct RayMarchInfo
 {
     double distance;
     int iterations;
+    double dot;
 };
 
 struct RGB
@@ -23,34 +25,24 @@ struct RGB
     int b;
 };
 
-struct Position
+double d(Vec3 v1, Vec3 v2)
 {
-    double x;
-    double y;
-    double z;
+    return (v1 - v2).getLength();
 };
 
-double d(Position p1, Position p2)
-{
-    return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) + (p1.y - p2.y) * (p1.y - p2.y));
-};
+RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
+{   
+    Vec3 x = startx;
+    Vec3 dx = Vec3::getUnitVector(phi, theta);
 
-RayMarchInfo calculateDistance(double startX, double startY, double startZ, double phi, double theta)
-{
-    double x = startX;
-    double y = startY;
-    double z = startZ;
-
-    double dx = sin(phi) * cos(theta);
-    double dy = sin(phi) * sin(theta);
-    double dz = cos(phi);
-
-    std::vector<Shape *> shapes = {new Sphere(10, 0, 0, 3), new Sphere(20, 10, 0, 3)};
+    std::vector<Shape*> shapes = {&Sphere(Vec3(10, 0, 0), 3), &Sphere(Vec3(20, 10, 0), 3)};
 
     double minDistance = DBL_MAX;
     double maxDistance = DBL_MIN;
     double prevMinDistance = DBL_MAX;
     double prevMaxDistance = DBL_MIN;
+    Shape* minShape = nullptr; 
+
     int iter = 0;
     double tol = 0.01;
     while (minDistance >= tol)
@@ -61,12 +53,14 @@ RayMarchInfo calculateDistance(double startX, double startY, double startZ, doub
 
         minDistance = DBL_MAX;
         maxDistance = DBL_MIN;
-        for (Shape *shape : shapes)
+
+        for (Shape* shape : shapes)
         {
-            double distance = shape->getMinimumDistance(x, y, z);
+            double distance = shape->getMinimumDistance(x);
             if (distance < minDistance)
             {
                 minDistance = distance;
+                minShape = shape;
             }
             if (distance > maxDistance)
             {
@@ -79,18 +73,19 @@ RayMarchInfo calculateDistance(double startX, double startY, double startZ, doub
         if (minDistance > prevMinDistance && maxDistance > prevMaxDistance)
         {
             // -1 means infinite
-            return {-1, iter};
+            return {-1, iter, 0};
         }
 
         x = x + dx * minDistance;
-        y = y + dy * minDistance;
-        z = z + dz * minDistance;
 
         iter++;
     }
 
-    double endDistance = d({x, y, z}, {startX, startY, startZ});
-    return {endDistance, iter};
+    double endDistance = d(x, startx);
+
+    double dot = minShape->getNormal(x)*(startx - x)/(startx - x).getLength();
+
+    return {endDistance, iter, dot};
 };
 
 RGB getColor(RayMarchInfo info)
@@ -101,8 +96,9 @@ RGB getColor(RayMarchInfo info)
         return {0, 0, 0};
     }
     else
-    {
-        return {255, 255, 255};
+    {   
+        double f = info.dot;
+        return {(int) (55 + 200*f), (int) (55 + 200*f), (int) (55 + 200*f)};
     }
 };
 
@@ -120,7 +116,7 @@ Uint32 toInt(RGB color)
     return (color.r << 24) + (color.b << 16) + (color.b << 8);
 }
 
-void setRenderedPixels(Uint32* pixels, const int W, const int H, Position startPosition, double startPhi, double startTheta)
+void setRenderedPixels(Uint32* pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
 {
     for (int i = 0; i < W; i++)
     {
@@ -129,39 +125,39 @@ void setRenderedPixels(Uint32* pixels, const int W, const int H, Position startP
             double phi = startPhi - M_PI / 3 + 2 * M_PI / 3 * j / H;
             double theta = startTheta - M_PI / 3 + 2 * M_PI / 3 * i / W;
 
-            RayMarchInfo info = calculateDistance(startPosition.x, startPosition.y, startPosition.z, phi, theta);
+            RayMarchInfo info = calculateDistance(startPosition, phi, theta);
             RGB color = getColor(info);
             pixels[(j * W + i)] = toInt(color);
         }
     }
 };
 
-void handleInput(std::map<int, bool> keyboard, Position &pos, double &phi, double &theta)
+void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &theta)
 {
 
     if (keyboard[SDL_KeyCode::SDLK_w])
     {
-        pos.x = pos.x + 1;
+        pos = pos + Vec3::getUnitVector(M_PI/2, theta);
     }
     if (keyboard[SDL_KeyCode::SDLK_s])
     {
-        pos.x = pos.x - 1;
+        pos = pos + Vec3::getUnitVector(M_PI/2, theta + M_PI);
     }
     if (keyboard[SDL_KeyCode::SDLK_a])
     {
-        pos.y = pos.y - 1;
+        pos = pos + Vec3::getUnitVector(M_PI/2, theta - M_PI/2);
     }
     if (keyboard[SDL_KeyCode::SDLK_d])
     {
-        pos.y = pos.y + 1;
+        pos = pos + Vec3::getUnitVector(M_PI/2, theta + M_PI/2);
     }
     if (keyboard[SDL_KeyCode::SDLK_SPACE])
     {
-        pos.z = pos.z + 1;
+        pos = pos + Vec3::getUnitVector(0, 0);
     }
     if (keyboard[SDL_KeyCode::SDLK_LSHIFT])
     {
-        pos.z = pos.z - 1;
+        pos = pos + Vec3::getUnitVector(M_PI, 0);
     }
     if (keyboard[SDL_KeyCode::SDLK_DOWN])
     {
@@ -183,10 +179,10 @@ void handleInput(std::map<int, bool> keyboard, Position &pos, double &phi, doubl
 
 int main(int argc, char *argv[])
 {
-    int W = 640;
-    int H = 480;
+    int W = 300;
+    int H = 300;
 
-    Position pos = {0, 0, 0};
+    Vec3 pos = Vec3(0, 0, 0);
     double phi = M_PI / 2;
     double theta = 0;
 

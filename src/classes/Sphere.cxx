@@ -1,10 +1,15 @@
 #include <math.h>
 
+#include "Shape.h"
 #include "Sphere.h"
 
-Sphere::Sphere(double x, double y, double z, double r) : x(x), y(y), z(z), r(r) {};
+Sphere::Sphere(Vec3 v, double r) : v(v), r(r) {};
 
-double Sphere::getMinimumDistance(double x, double y, double z)
+double Sphere::getMinimumDistance(Vec3 v)
 {
-    return sqrt((x - this->x)*(x - this->x) + (y - this->y)*(y - this->y) + (z - this->z)*(z - this->z)) - this->r;
+    return (v - this->v).getLength() - this->r;
+}
+
+Vec3 Sphere::getNormal(Vec3 v) {
+    return (v - this->v)/(v - this->v).getLength();
 }
