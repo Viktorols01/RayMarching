@@ -9,12 +9,13 @@ Cube::Cube(Vec3 v, double r) : v(v), r(r) {};
 double Cube::getMinimumDistance(Vec3 v)
 {
     Vec3 q = (v - this->v).absolute();
-    return std::max(q.x - r, std::max(q.y - r, q.z - r));
+    double m = std::max(q.x - r, std::max(q.y - r, q.z - r));
+    return m > 0 ? m : q.getLength() - r/sqrt(3);
 }
 
 Vec3 Cube::getNormal(Vec3 v)
 {
-    Vec3 q = (v - this->v).absolute();
+    Vec3 q = (v - this->v);
 
     if (fabs(q.x) > fabs(q.y) && fabs(q.x) > fabs(q.z))
     {
