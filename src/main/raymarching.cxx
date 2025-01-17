@@ -126,9 +126,10 @@ void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosit
     {
         for (int j = 0; j < H; j++)
         {
-            double range = M_PI / 2;
-            double phi = startPhi - range / 2 + range * j / H;
-            double theta = startTheta - range / 2 + range * i / W;
+            double phi_range = M_PI / 3;
+            double theta_range = M_PI / 2;
+            double phi = startPhi - phi_range / 2 + phi_range * j / H;
+            double theta = startTheta - theta_range / 2 + theta_range * i / W;
 
             RayMarchInfo info = calculateDistance(startPosition, phi, theta);
             RGB color = getColor(info);

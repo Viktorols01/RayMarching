@@ -8,6 +8,7 @@ Cube::Cube(Vec3 v, double r) : v(v), r(r) {};
 
 double Cube::getMinimumDistance(Vec3 v)
 {
+    // TODO: rotation
     Vec3 q = (v - this->v).absolute();
     double m = std::max(q.x - r, std::max(q.y - r, q.z - r));
     return m > 0 ? m : q.getLength() - r/sqrt(3);
