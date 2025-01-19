@@ -1,5 +1,6 @@
 #include <math.h>
 #include <utility>
+#include <iostream>
 
 #include "Shape.h"
 #include "CombinedShape.h"
@@ -22,7 +23,7 @@ Vec3 CombinedShape::getNormal(Vec3 v)
 {
     if (subtract)
     {
-        return s1->getMinimumDistance(v) > -s2->getMinimumDistance(v) ? s1->getNormal(v) : s2->getNormal(v) * -1;
+        return s1->getMinimumDistance(v) > -(s2->getMinimumDistance(v)) ? s1->getNormal(v) : s2->getNormal(v) * -1.0;
     }
     else
     {
