@@ -12,6 +12,7 @@
 #include "Sphere.h"
 #include "Cube.h"
 #include "CombinedShape.h"
+#include "InfiniSphere.h"
 #include "Vec3.h"
 
 struct RGB
@@ -39,10 +40,13 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
     Vec3 x = startx;
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
-    Shape* combinedShape = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
+    Shape* combinedShape1 = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
+    Shape* combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 4), &Cube(Vec3(16, 0, 0), 2), true);
     std::vector<Shape *> shapes = {
-        &Sphere(Vec3(20, 0, 0), 3),
-        combinedShape};
+        //&InfiniSphere(Vec3(5, 5, 5), 1, 30),
+        combinedShape1,
+        combinedShape2,
+        };
 
     double minDistanceTotal = DBL_MAX;
     double minDistance = DBL_MAX;
@@ -89,7 +93,9 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
 
     double endDistance = d(x, startx);
 
-    double dot = minShape->getNormal(x) * (startx - x) / (startx - x).getLength();
+    double dot1 = minShape->getNormal(x) * (startx - x) / (startx - x).getLength();
+    double dot2 = minShape->getNormal(x) * Vec3(0, 0, 1);
+    double dot = (3*max(dot1, 0) + max(dot2, 0))/4;
 
     return {endDistance, minDistanceTotal, iter, dot};
 };
@@ -100,8 +106,8 @@ RGB getColor(RayMarchInfo info)
     if (info.distance == -1)
     {
         int r = 0;
-        int g = (int) 155/max(1.0, info.minDistance);
-        int b = (int) 155/max(1.0, info.minDistance);
+        int g = 100/max(1, info.minDistance);
+        int b = 200/max(1, info.minDistance);
         return {r, g, b};
     }
     else
@@ -210,10 +216,6 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, W, H);
     std::map<int, bool> keyboard;
-
-    RayMarchInfo info = rayMarchDistance(pos, phi, theta);
-    std::cout << "Distance: " << info.distance << std::endl;
-    std::cout << "Iterations: " << info.iterations << std::endl;
 
     while (true)
     {

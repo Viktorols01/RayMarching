@@ -44,7 +44,7 @@ Vec3 Vec3::operator/(double d)
 
 Vec3 Vec3::operator%(double d)
 {
-    return Vec3(std::fmod(this->x, d), std::fmod(this->y, d), std::fmod(this->z, d));
+    return Vec3(std::remainder(this->x, d), std::remainder(this->y, d), std::remainder(this->z, d));
 }
 
 double Vec3::operator*(Vec3 const& v) {

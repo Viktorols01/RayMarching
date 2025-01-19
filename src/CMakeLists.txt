@@ -11,6 +11,7 @@ add_executable(RayMarching
     classes/Cube.cxx
     classes/Vec3.cxx
     classes/CombinedShape.cxx
+    classes/InfiniSphere.cxx
     )
 
 target_link_libraries(RayMarching ${SDL2_LIBRARIES})
