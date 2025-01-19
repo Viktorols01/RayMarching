@@ -10,6 +10,7 @@
 #include "Shape.h"
 #include "Sphere.h"
 #include "Cube.h"
+#include "CombinedShape.h"
 #include "Vec3.h"
 
 struct RayMarchInfo
@@ -36,10 +37,12 @@ RayMarchInfo calculateDistance(Vec3 startx, double phi, double theta)
     Vec3 x = startx;
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
+    Shape* combinedShape = new CombinedShape(&Cube(Vec3(20, 0, 0), 4), &Sphere(Vec3(18, 0, 0), 1), true);
     std::vector<Shape *> shapes = {
         //&Sphere(Vec3(10, 0, 0), 3),
-        &Sphere(Vec3(20, 10, 0), 3),
-        &Cube(Vec3(20, -10, 0), 3)};
+        &Sphere(Vec3(40, 10, 0), 3),
+        &Cube(Vec3(40, -10, 0), 3),
+        combinedShape};
 
     double minDistance = DBL_MAX;
     double maxDistance = DBL_MIN;

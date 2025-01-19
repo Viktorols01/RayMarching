@@ -4,14 +4,14 @@
 #include "Shape.h"
 #include "Cube.h"
 
-Cube::Cube(Vec3 v, double r) : v(v), r(r) {};
+Cube::Cube(Vec3 v, double w) : v(v), w(w) {};
 
 double Cube::getMinimumDistance(Vec3 v)
 {
     // TODO: rotation
     Vec3 q = (v - this->v).absolute();
-    double m = std::max(q.x - r, std::max(q.y - r, q.z - r));
-    return m > 0 ? m : q.getLength() - r/sqrt(3);
+    double m = std::max(q.x - w/2, std::max(q.y - w/2, q.z - w/2));
+    return m > 0 ? m : q.getLength() - w/(2*sqrt(3));
 }
 
 Vec3 Cube::getNormal(Vec3 v)
