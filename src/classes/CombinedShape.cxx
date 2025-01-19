@@ -15,7 +15,7 @@ double CombinedShape::getMinimumDistance(Vec3 v)
     }
     else
     {
-        return std::min(s1->getMinimumDistance(v), s2->getMinimumDistance(v));
+        return std::max(s1->getMinimumDistance(v), s2->getMinimumDistance(v));
     }
 }
 
@@ -27,6 +27,6 @@ Vec3 CombinedShape::getNormal(Vec3 v)
     }
     else
     {
-        return s1->getMinimumDistance(v) < s2->getMinimumDistance(v) ? s1->getNormal(v) : s2->getNormal(v);
+        return s1->getMinimumDistance(v) > s2->getMinimumDistance(v) ? s1->getNormal(v) : s2->getNormal(v);
     }
 }

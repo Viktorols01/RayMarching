@@ -41,7 +41,7 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
     Shape* combinedShape1 = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
-    Shape* combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 4), &Cube(Vec3(16, 0, 0), 2), true);
+    Shape* combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 2.5), &Cube(Vec3(20, 0, 0), 4), false);
     std::vector<Shape *> shapes = {
         //&InfiniSphere(Vec3(5, 5, 5), 1, 30),
         combinedShape1,
