@@ -40,13 +40,13 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
     Vec3 x = startx;
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
-    Shape* combinedShape1 = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
-    Shape* combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 2.5), &Cube(Vec3(20, 0, 0), 4), false);
+    Shape *combinedShape1 = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
+    Shape *combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 2.5), &Cube(Vec3(20, 0, 0), 4), false);
     std::vector<Shape *> shapes = {
         //&InfiniSphere(Vec3(5, 5, 5), 1, 30),
         combinedShape1,
         combinedShape2,
-        };
+    };
 
     double minDistanceTotal = DBL_MAX;
     double minDistance = DBL_MAX;
@@ -95,7 +95,7 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
 
     double dot1 = minShape->getNormal(x) * (startx - x) / (startx - x).getLength();
     double dot2 = minShape->getNormal(x) * Vec3(0, 0, 1);
-    double dot = (3*max(dot1, 0) + max(dot2, 0))/4;
+    double dot = (3 * max(dot1, 0) + max(dot2, 0)) / 4;
 
     return {endDistance, minDistanceTotal, iter, dot};
 };
@@ -106,8 +106,8 @@ RGB getColor(RayMarchInfo info)
     if (info.distance == -1)
     {
         int r = 0;
-        int g = 100/max(1, info.minDistance);
-        int b = 200/max(1, info.minDistance);
+        int g = 100 / max(1, info.minDistance);
+        int b = 200 / max(1, info.minDistance);
         return {r, g, b};
     }
     else
@@ -120,9 +120,9 @@ RGB getColor(RayMarchInfo info)
 RGB toRGB(Uint32 rgbInt)
 {
     RGB color;
-    color.r = (rgbInt & 0xFF0000) >> 24;
-    color.g = (rgbInt & 0x00FF00) >> 16;
-    color.b = (rgbInt & 0x0000FF) >> 8;
+    color.r = (rgbInt & 0xFF000000) >> 24;
+    color.g = (rgbInt & 0x00FF0000) >> 16;
+    color.b = (rgbInt & 0x0000FF00) >> 8;
     return color;
 }
 
@@ -131,22 +131,95 @@ Uint32 toInt(RGB color)
     return (color.r << 24) + (color.b << 16) + (color.b << 8);
 }
 
-void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
+int getPixelIndex(int i, int j, int W)
 {
-    for (int i = 0; i < W; i++)
-    {
-        for (int j = 0; j < H; j++)
-        {
-            double phi_range = M_PI / 3;
-            double theta_range = M_PI / 2;
-            double phi = startPhi - phi_range / 2 + phi_range * j / H;
-            double theta = startTheta - theta_range / 2 + theta_range * i / W;
+    return (j * W + i);
+}
 
-            RayMarchInfo info = rayMarchDistance(startPosition, phi, theta);
-            RGB color = getColor(info);
-            pixels[(j * W + i)] = toInt(color);
+RGB getPixelColor(int i, int j, Vec3 startPosition, double startPhi, double startTheta, int W, int H)
+{
+    double phi_range = M_PI / 3;
+    double theta_range = M_PI / 2;
+    double phi = startPhi - phi_range / 2 + phi_range * j / H;
+    double theta = startTheta - theta_range / 2 + theta_range * i / W;
+
+    RayMarchInfo info = rayMarchDistance(startPosition, phi, theta);
+    RGB color = getColor(info);
+    return color;
+}
+
+void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
+{   
+
+    int pixelSkip = 8;
+    bool* rendered = new bool[W*H];
+    for (int i = 0; i < W*H; i++) {
+        rendered[i] = false;
+    }
+
+    for (int i = 0; i < W - pixelSkip; i += pixelSkip)
+    {
+        for (int j = 0; j < H - pixelSkip; j += pixelSkip)
+        {
+
+            RGB colorUL;
+            if (rendered[getPixelIndex(i, j, W)])
+            {
+                colorUL = toRGB(pixels[getPixelIndex(i, j, W)]);
+            }
+            else
+            {
+                colorUL = getPixelColor(i, j, startPosition, startPhi, startTheta, W, H);
+            }
+            RGB colorUR;
+            if (rendered[getPixelIndex(i + pixelSkip, j, W)])
+            {
+                colorUR = toRGB(pixels[getPixelIndex(i + pixelSkip, j, W)]);
+            }
+            else
+            {
+                colorUR = getPixelColor(i + pixelSkip, j, startPosition, startPhi, startTheta, W, H);
+            }
+            RGB colorDR;
+            if (rendered[getPixelIndex(i + pixelSkip, j + pixelSkip, W)])
+            {
+                colorDR = toRGB(pixels[getPixelIndex(i + pixelSkip, j + pixelSkip, W)]);
+            }
+            else
+            {
+                colorDR = getPixelColor(i + pixelSkip, j + pixelSkip, startPosition, startPhi, startTheta, W, H);
+            }
+            RGB colorDL;
+            if (rendered[getPixelIndex(i, j + pixelSkip, W)])
+            {
+                colorDL = toRGB(pixels[getPixelIndex(i, j + pixelSkip, W)]);
+            }
+            else
+            {
+                colorDL = getPixelColor(i, j + pixelSkip, startPosition, startPhi, startTheta, W, H);
+            }
+
+            for (int x = 0; x <= pixelSkip; x++)
+            {
+                for (int y = 0; y <= pixelSkip; y++)
+                {
+                    double N1 = (pixelSkip - x) * (pixelSkip - y) / static_cast<double>(pixelSkip * pixelSkip);
+                    double N2 = (x) * (pixelSkip - y) / static_cast<double>(pixelSkip * pixelSkip);
+                    double N3 = (x) * (y) / static_cast<double>(pixelSkip * pixelSkip);
+                    double N4 = (pixelSkip - x) * (y) / static_cast<double>(pixelSkip * pixelSkip);
+
+                    RGB color;
+                    color.r = (int)(N1 * colorUL.r + N2 * colorUR.r + N3 * colorDR.r + N4 * colorDL.r);
+                    color.g = (int)(N1 * colorUL.g + N2 * colorUR.g + N3 * colorDR.g + N4 * colorDL.g);
+                    color.b = (int)(N1 * colorUL.b + N2 * colorUR.b + N3 * colorDR.b + N4 * colorDL.b);
+
+                    pixels[getPixelIndex(i + x, j + y, W)] = toInt(color);
+                    rendered[getPixelIndex(i + x, j + y, W)] = true;
+                }
+            }
         }
     }
+    delete[] rendered;
 };
 
 void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &theta)
@@ -196,8 +269,8 @@ void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &t
 
 int main(int argc, char *argv[])
 {
-    int W = 200;
-    int H = 200;
+    int W = 1000;
+    int H = 1000;
 
     Vec3 pos = Vec3(0, 0, 0);
     double phi = M_PI / 2;
