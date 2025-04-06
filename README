@@ -1,1 +1,3 @@
 SDL2.dll (found in lib/x64) must be put next to executable
+
+To build: cmake -S src -B build; make -C build/Makefile
