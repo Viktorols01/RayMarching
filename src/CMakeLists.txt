@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(RayMarching)
 
-set(SDL2_DIR SDL2)
+#message(${SDL2_INCLUDE_DIRS})
+#message(${SDL2_LIBRARIES})
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/../include)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
-message(${SDL2_INCLUDE_DIRS})
-message(${SDL2_LIBRARIES})
+include_directories(${CMAKE_SOURCE_DIR}/../include)
+add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 
 add_executable(RayMarching 
     main/raymarching.cxx
@@ -19,4 +20,11 @@ add_executable(RayMarching
     classes/InfiniSphere.cxx
     )
 
-target_link_libraries(RayMarching ${SDL2_LIBRARIES})
+add_executable(Hello 
+    main/hello.c
+    EXCLUDE_FROM_ALL
+    )
+
+target_link_libraries(RayMarching PRIVATE SDL3::SDL3)
+
+target_link_libraries(Hello PRIVATE SDL3::SDL3)

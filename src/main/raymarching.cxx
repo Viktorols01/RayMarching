@@ -8,7 +8,10 @@
 #include <float.h>
 #include <algorithm>
 
-#include "SDL.h"
+#define SDL_MAIN_USE_CALLBACKS 1
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+
 #include "Shape.h"
 #include "Sphere.h"
 #include "Cube.h"
@@ -230,48 +233,49 @@ void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosit
 void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &theta)
 {
 
-    if (keyboard[SDL_KeyCode::SDLK_w])
+    if (keyboard[SDLK_W])
     {
         pos = pos + Vec3::getUnitVector(M_PI / 2, theta);
     }
-    if (keyboard[SDL_KeyCode::SDLK_s])
+    if (keyboard[SDLK_S])
     {
         pos = pos + Vec3::getUnitVector(M_PI / 2, theta + M_PI);
     }
-    if (keyboard[SDL_KeyCode::SDLK_a])
+    if (keyboard[SDLK_A])
     {
         pos = pos + Vec3::getUnitVector(M_PI / 2, theta - M_PI / 2);
     }
-    if (keyboard[SDL_KeyCode::SDLK_d])
+    if (keyboard[SDLK_D])
     {
         pos = pos + Vec3::getUnitVector(M_PI / 2, theta + M_PI / 2);
     }
-    if (keyboard[SDL_KeyCode::SDLK_SPACE])
+    if (keyboard[SDLK_SPACE])
     {
         pos = pos + Vec3::getUnitVector(0, 0);
     }
-    if (keyboard[SDL_KeyCode::SDLK_LSHIFT])
+    if (keyboard[SDLK_LSHIFT])
     {
         pos = pos + Vec3::getUnitVector(M_PI, 0);
     }
-    if (keyboard[SDL_KeyCode::SDLK_DOWN])
+    if (keyboard[SDLK_DOWN])
     {
         phi = phi + 0.1;
     }
-    if (keyboard[SDL_KeyCode::SDLK_UP])
+    if (keyboard[SDLK_UP])
     {
         phi = phi - 0.1;
     }
-    if (keyboard[SDL_KeyCode::SDLK_RIGHT])
+    if (keyboard[SDLK_RIGHT])
     {
         theta = theta + 0.1;
     }
-    if (keyboard[SDL_KeyCode::SDLK_LEFT])
+    if (keyboard[SDLK_LEFT])
     {
         theta = theta - 0.1;
     }
 }
 
+// Bruh... New version of SDL doesn't like me using main
 int main(int argc, char *argv[])
 {
     int W = 1000;
@@ -285,13 +289,11 @@ int main(int argc, char *argv[])
 
     SDL_Window *window = SDL_CreateWindow(
         "SDL2Test",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
         W,
         H,
         0);
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
     SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, W, H);
     std::map<int, bool> keyboard;
 
@@ -302,7 +304,7 @@ int main(int argc, char *argv[])
         SDL_LockTexture(texture, NULL, &pixels, &pitch);
         setRenderedPixels((Uint32 *)pixels, W, H, pos, phi, theta);
         SDL_UnlockTexture(texture);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderTexture(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
         SDL_Event event;
@@ -310,11 +312,11 @@ int main(int argc, char *argv[])
         {
             switch (event.type)
             {
-            case SDL_KEYDOWN:
-                keyboard[event.key.keysym.sym] = true;
+            case SDL_EVENT_KEY_DOWN:
+                keyboard[event.key.key] = true;
                 break;
-            case SDL_KEYUP:
-                keyboard[event.key.keysym.sym] = false;
+            case SDL_EVENT_KEY_UP:
+                keyboard[event.key.key] = false;
                 break;
             }
         }
