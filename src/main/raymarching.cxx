@@ -136,6 +136,7 @@ RGB toRGB(Uint32 rgbInt)
 
 Uint32 toInt(RGB color)
 {
+    // Previously forgot to add 255, which made everything transparent
     return (color.r << 24) + (color.b << 16) + (color.b << 8) + 255;
 }
 
