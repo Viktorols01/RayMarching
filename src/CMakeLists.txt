@@ -21,8 +21,8 @@ add_executable(RayMarching
     )
 
 add_executable(Hello 
-    main/hello.c
     EXCLUDE_FROM_ALL
+    main/hello.c
     )
 
 target_link_libraries(RayMarching PRIVATE SDL3::SDL3)

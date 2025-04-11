@@ -10,11 +10,6 @@ CombinedShape::CombinedShape(Shape* s1, Shape* s2, bool subtract) : subtract(sub
     this->s2 = s2; 
 };
 
-CombinedShape::~CombinedShape() {
-    delete s1;
-    delete s2;
-}
-
 double CombinedShape::getMinimumDistance(Vec3 v)
 {
     if (subtract)

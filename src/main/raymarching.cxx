@@ -45,10 +45,10 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
     // This code is cursed but I just want it to work for now :)
-    Shape* combinedShape1 = new CombinedShape(new Cube(Vec3(24, 0, 0), 16), new Cube(Vec3(20, 0, 0), 12), true);
-    Shape* combinedShape2 = new CombinedShape(new Sphere(Vec3(20, 0, 0), 2.5), new Cube(Vec3(20, 0, 0), 4), false);
+    Shape *combinedShape1 = new CombinedShape(new Cube(Vec3(24, 0, 0), 16), new Cube(Vec3(20, 0, 0), 12), true);
+    Shape *combinedShape2 = new CombinedShape(new Sphere(Vec3(20, 0, 0), 2.5), new Cube(Vec3(20, 0, 0), 4), false);
     std::vector<Shape *> shapes = {
-        new InfiniSphere(Vec3(5, 5, 5), 1, 30),
+        //new InfiniSphere(Vec3(5, 5, 5), 1, 30),
         combinedShape1,
         combinedShape2,
     };
@@ -136,7 +136,7 @@ RGB toRGB(Uint32 rgbInt)
 
 Uint32 toInt(RGB color)
 {
-    return (color.r << 24) + (color.b << 16) + (color.b << 8);
+    return (color.r << 24) + (color.b << 16) + (color.b << 8) + 255;
 }
 
 int getPixelIndex(int i, int j, int W)
@@ -157,11 +157,12 @@ RGB getPixelColor(int i, int j, Vec3 startPosition, double startPhi, double star
 }
 
 void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
-{   
+{
 
-    int pixelSkip = 10;
-    bool* rendered = new bool[W*H];
-    for (int i = 0; i < W*H; i++) {
+    int pixelSkip = 4;
+    bool *rendered = new bool[W * H];
+    for (int i = 0; i < W * H; i++)
+    {
         rendered[i] = false;
     }
 
@@ -220,8 +221,9 @@ void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosit
                     color.r = (int)(N1 * colorUL.r + N2 * colorUR.r + N3 * colorDR.r + N4 * colorDL.r);
                     color.g = (int)(N1 * colorUL.g + N2 * colorUR.g + N3 * colorDR.g + N4 * colorDL.g);
                     color.b = (int)(N1 * colorUL.b + N2 * colorUR.b + N3 * colorDR.b + N4 * colorDL.b);
-
-                    pixels[getPixelIndex(i + x, j + y, W)] = toInt(color);
+                    
+                    int intCol = toInt(color);
+                    pixels[getPixelIndex(i + x, j + y, W)] = intCol;
                     rendered[getPixelIndex(i + x, j + y, W)] = true;
                 }
             }
@@ -273,59 +275,76 @@ void handleInput(std::map<int, bool> keyboard, Vec3 &pos, double &phi, double &t
     {
         theta = theta - 0.1;
     }
+    if (keyboard[SDLK_ESCAPE])
+    {
+        exit(0);
+    }
 }
 
-// Bruh... New version of SDL doesn't like me using main
-int main(int argc, char *argv[])
-{
-    int W = 1000;
-    int H = 1000;
+static int W = 400;
+static int H = 400;
+static SDL_Window *window = NULL;
+static SDL_Renderer *renderer = NULL;
+static SDL_Texture *texture;
+static std::map<int, bool> keyboard;
 
-    Vec3 pos = Vec3(0, 0, 0);
-    double phi = M_PI / 2;
-    double theta = 0;
+static Vec3 pos = Vec3(0, 0, 0);
+static double phi = 0;
+static double theta = 0;
+
+/* This function runs once at startup. */
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
+{
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window *window = SDL_CreateWindow(
+    window = SDL_CreateWindow(
         "SDL2Test",
         W,
         H,
         0);
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
-    SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, W, H);
-    std::map<int, bool> keyboard;
+    renderer = SDL_CreateRenderer(window, NULL);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, W, H);
 
-    while (true)
+    return SDL_APP_CONTINUE;
+}
+
+/* This function runs when a new event (mouse input, keypresses, etc) occurs. */
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
+{
+    switch (event->type)
     {
-        void *pixels = new Uint32[W * H];
-        int pitch;
-        SDL_LockTexture(texture, NULL, &pixels, &pitch);
-        setRenderedPixels((Uint32 *)pixels, W, H, pos, phi, theta);
-        SDL_UnlockTexture(texture);
-        SDL_RenderTexture(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-            case SDL_EVENT_KEY_DOWN:
-                keyboard[event.key.key] = true;
-                break;
-            case SDL_EVENT_KEY_UP:
-                keyboard[event.key.key] = false;
-                break;
-            }
-        }
-
-        handleInput(keyboard, pos, phi, theta);
+    case SDL_EVENT_KEY_DOWN:
+        keyboard[event->key.key] = true;
+        break;
+    case SDL_EVENT_KEY_UP:
+        keyboard[event->key.key] = false;
+        break;
     }
+    return SDL_APP_CONTINUE;
+}
 
+/* This function runs once per frame, and is the heart of the program. */
+SDL_AppResult SDL_AppIterate(void *appstate)
+{
+    void *pixels = new Uint32[W * H];
+    int pitch;
+    SDL_LockTexture(texture, NULL, &pixels, &pitch);
+    setRenderedPixels((Uint32 *)pixels, W, H, pos, phi, theta);
+    SDL_UnlockTexture(texture);
+    SDL_RenderTexture(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
+
+    handleInput(keyboard, pos, phi, theta);
+    return SDL_APP_CONTINUE;
+}
+
+/* This function runs once at shutdown. */
+void SDL_AppQuit(void *appstate, SDL_AppResult result)
+{
     SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyTexture(texture);
     SDL_Quit();
-
-    return 0;
-};
+}
