@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(RayMarching)
 
+set(SDL2_DIR "SDL2")
 find_package(SDL2 REQUIRED)
 include_directories(RayMarching ${SDL2_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/../include)
 

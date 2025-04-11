@@ -5,7 +5,15 @@
 #include "Shape.h"
 #include "CombinedShape.h"
 
-CombinedShape::CombinedShape(Shape *s1, Shape *s2, bool subtract) : s1(s1), s2(s2), subtract(subtract) {};
+CombinedShape::CombinedShape(Shape* s1, Shape* s2, bool subtract) : subtract(subtract) {
+    this->s1 = s1;
+    this->s2 = s2; 
+};
+
+CombinedShape::~CombinedShape() {
+    delete s1;
+    delete s2;
+}
 
 double CombinedShape::getMinimumDistance(Vec3 v)
 {

@@ -1,1 +1,4 @@
 SDL2.dll (found in lib/x64) must be put next to executable
+´´´bash
+cmake -S src -B build -G "Ninja"; ninja -C build; ./build/Debug/RayMarching.exe
+´´´

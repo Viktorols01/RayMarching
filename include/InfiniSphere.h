@@ -10,7 +10,7 @@ class InfiniSphere : public Shape {
     double r;
     double s;
     public:
-    InfiniSphere::InfiniSphere(Vec3 v, double r, double s);
+    InfiniSphere(Vec3 v, double r, double s);
     double getMinimumDistance(Vec3 v);
     Vec3 getNormal(Vec3 v);
 };

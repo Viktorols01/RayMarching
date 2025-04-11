@@ -10,7 +10,8 @@ class CombinedShape : public Shape {
     Shape* s2;
     bool subtract;
     public:
-    CombinedShape::CombinedShape(Shape* s1, Shape* s2, bool subtract);
+    CombinedShape(Shape* s1, Shape* s2, bool subtract);
+    ~CombinedShape();
     double getMinimumDistance(Vec3 v);
     Vec3 getNormal(Vec3 v);
 };

@@ -6,6 +6,7 @@
 #include <map>
 #include <utility>
 #include <float.h>
+#include <algorithm>
 
 #include "SDL.h"
 #include "Shape.h"
@@ -40,8 +41,9 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
     Vec3 x = startx;
     Vec3 dx = Vec3::getUnitVector(phi, theta);
 
-    Shape *combinedShape1 = &CombinedShape(&Cube(Vec3(24, 0, 0), 16), &Cube(Vec3(20, 0, 0), 12), true);
-    Shape *combinedShape2 = &CombinedShape(&Sphere(Vec3(20, 0, 0), 2.5), &Cube(Vec3(20, 0, 0), 4), false);
+    // This code is cursed but I just want it to work for now :)
+    Shape* combinedShape1 = new CombinedShape(new Cube(Vec3(24, 0, 0), 16), new Cube(Vec3(20, 0, 0), 12), true);
+    Shape* combinedShape2 = new CombinedShape(new Sphere(Vec3(20, 0, 0), 2.5), new Cube(Vec3(20, 0, 0), 4), false);
     std::vector<Shape *> shapes = {
         //&InfiniSphere(Vec3(5, 5, 5), 1, 30),
         combinedShape1,
@@ -95,7 +97,10 @@ RayMarchInfo rayMarchDistance(Vec3 startx, double phi, double theta)
 
     double dot1 = minShape->getNormal(x) * (startx - x) / (startx - x).getLength();
     double dot2 = minShape->getNormal(x) * Vec3(0, 0, 1);
-    double dot = (3 * max(dot1, 0) + max(dot2, 0)) / 4;
+    double dot = (3 * std::max(dot1, 0.0) + std::max(dot2, 0.0)) / 4;
+
+    delete combinedShape1;
+    delete combinedShape2;
 
     return {endDistance, minDistanceTotal, iter, dot};
 };
@@ -106,8 +111,8 @@ RGB getColor(RayMarchInfo info)
     if (info.distance == -1)
     {
         int r = 0;
-        int g = 100 / max(1, info.minDistance);
-        int b = 200 / max(1, info.minDistance);
+        int g = 100 / std::max(1.0, info.minDistance);
+        int b = 200 / std::max(1.0, info.minDistance);
         return {r, g, b};
     }
     else
@@ -151,7 +156,7 @@ RGB getPixelColor(int i, int j, Vec3 startPosition, double startPhi, double star
 void setRenderedPixels(Uint32 *pixels, const int W, const int H, Vec3 startPosition, double startPhi, double startTheta)
 {   
 
-    int pixelSkip = 8;
+    int pixelSkip = 10;
     bool* rendered = new bool[W*H];
     for (int i = 0; i < W*H; i++) {
         rendered[i] = false;

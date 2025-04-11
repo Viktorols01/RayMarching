@@ -9,7 +9,7 @@ class Sphere : public Shape {
     Vec3 v;
     double r;
     public:
-    Sphere::Sphere(Vec3 v, double r);
+    Sphere(Vec3 v, double r);
     double getMinimumDistance(Vec3 v);
     Vec3 getNormal(Vec3 v);
 };

@@ -7,18 +7,18 @@ class Vec3 {
     double y;
     double z;
 
-    Vec3::Vec3(double x, double y, double z);
-    double Vec3::getLength();
-    Vec3 Vec3::absolute();
-    static Vec3 Vec3::getUnitVector(double phi, double theta);
+    Vec3(double x, double y, double z);
+    double getLength();
+    Vec3 absolute();
+    static Vec3 getUnitVector(double phi, double theta);
 
-    Vec3 Vec3::operator+(Vec3 const& v);
-    Vec3 Vec3::operator-(Vec3 const& v);
-    Vec3 Vec3::operator*(double d);
-    Vec3 Vec3::operator/(double d);
-    Vec3 Vec3::operator%(double d);
+    Vec3 operator+(Vec3 const& v);
+    Vec3 operator-(Vec3 const& v);
+    Vec3 operator*(double d);
+    Vec3 operator/(double d);
+    Vec3 operator%(double d);
 
-    double Vec3::operator*(Vec3 const& v);
+    double operator*(Vec3 const& v);
 };
 
 #endif
